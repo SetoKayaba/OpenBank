@@ -2,6 +2,7 @@
 
 
 # Setting up Imports and file system Dependencies
+import bank_ops as bank
 import Authenticator as auth
 
 preferences = open("preferences").read()
@@ -14,8 +15,8 @@ class Session:  # Session Class
     def __init__(self):  # function to initialize with the Session Class
         if self.session_status is -1:  # condition to execute connect function
             self.user_options()
-        else:  # if user data is not provided execute options function with a param of 1
-            self.user_options()
+        elif self.session_status is 0:  # if user data is not provided execute options function with a param of 1
+            self.user_options(1)
 
     def connect(self, user_id, password):
         self.authenticate(user_id, password)
@@ -46,17 +47,21 @@ class Session:  # Session Class
         oAuthToken = None
         user_data = auth.UserOptions
         user_data.login(user_id, password)
-        if user_data.status is True:
+        if user_data.response is True:
             oAuthToken = auth.user_data.getkey()
             self.session_status = 1
             oAuthToken = user_data.getkey()
+            self.connect(self, oAuthToken)
         elif user_data.status is False:
             self.session_status = 0
             self.user_options()
         else:
-            
-        # Establish a connection
-        auth.dataflow(oAuthToken)
+            exit()
+
+    # Establish a connection
+    def connect(self, token):
+        data_object = auth.dataflow(token)
+        return bank.access(data_object)
 
 
 # CLI Implementation for Quick Testing
@@ -71,3 +76,4 @@ if __name__ == '__main__':
 
     else:
         LoginStep = input("To Login to existing account: 1\nTo Register a New Account: 2\To nRecover an Account: 3")
+
